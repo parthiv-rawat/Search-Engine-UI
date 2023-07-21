@@ -1,44 +1,53 @@
 <script>
-    
+    import { onMount, onDestroy } from "svelte";
     import { fade, fly, scale } from "svelte/transition";
     import { quintIn, quintOut, elasticInOut } from "svelte/easing";
     import { tweened } from "svelte/motion";
+
     import InputAndSuggestions from "./InputAndSuggestions.svelte";
+    import Profile from "./Profile.svelte";
 
     let field = "";
     let isVisible = true;
+    export let isProfile;
     export let handleSubmit;
-
+    
     // function toggleVisibility() {
     //     isVisible = !isVisible;
     // }
     // ----------------------------------------------------
-    
 </script>
 
-<header>
-    <!-- {#if isVisible} -->
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <img src="images/image.png" alt="Logo" class="logo" />
-    <!-- {/if} -->
-    <h1>FlyHigh Edutech Search Engine</h1>
-</header>
+{#if !isProfile}
+    <header>
+        <a href="/">
+            <!-- {#if isVisible} -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <img src="images/image.png" alt="Logo" class="logo" />
+            <!-- {/if} -->
+            <h1>FlyHigh Edutech Search Engine</h1>
+        </a>
+        <button on:click>Profile</button>
+    </header>
 
-<main>
-    <!-- {#if !isVisible} -->
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- <img
+    <main>
+        <!-- {#if !isVisible} -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- <img
         src="images/image.png"
         on:click={toggleVisibility}
             transition:scale
             alt="Logo"
             class="logo"
             /> -->
-    <!-- {/if} -->
-    <form on:submit={handleSubmit}>
-       <InputAndSuggestions />
-    </form> 
-</main>
+        <!-- {/if} -->
+        <form on:submit={handleSubmit}>
+            <InputAndSuggestions />
+        </form>
+    </main>
+{:else}
+    <Profile on:click />
+{/if}
 
 <footer>
     <p>© 2023 Search Engine. All rights reserved.</p>
@@ -53,6 +62,10 @@
         display: inline;
         height: 100px;
     }
+
+    img:hover {
+        scale: 1.1;
+    }
     header {
         display: flex;
         justify-content: center;
@@ -63,9 +76,38 @@
         text-align: center;
     }
 
+    header a {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    header a:visited {
+        color: #fff;
+    }
     header img {
         cursor: pointer;
     }
+
+    header button {
+        position: absolute;
+        right: 50px;
+        padding: 5px;
+        font-size: medium;
+        background-color: #fff;
+        border: 1px solid #c9c3c3;
+        width: 90px;
+        height: 90px;
+        border-radius: 30%;
+        display: block;
+        cursor: pointer;
+    }
+
+    header button:hover {
+        scale: 1.15;
+    }
+
     h1 {
         display: inline;
         margin: 5px;
@@ -93,7 +135,6 @@
         align-items: center;
     } */
 
-    
     footer {
         display: flex;
         flex-shrink: 0;

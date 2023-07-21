@@ -3,6 +3,7 @@
     export let currentPage;
     export let totalPages;
     export let onChangePage;
+    // console.log(totalPages)
 </script>
 
 <div class="pagination">
@@ -51,6 +52,7 @@
         justify-content: center;
         align-items: center;
         margin-top: 20px;
+        margin-bottom: 15px;
     }
 
     .page {
@@ -66,5 +68,10 @@
         font-weight: bold;
         background-color: #e9ab39;
         color: #fff;
+    }
+
+    .page:hover,
+    .active-page:hover {
+        scale: 1.1;
     }
 </style>

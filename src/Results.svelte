@@ -1,20 +1,24 @@
 <script>
     import Pagination from "./Pagination.svelte";
     import { onMount, afterUpdate } from "svelte";
+    import Profile from "./Profile.svelte";
+
     export let handleSubmit;
     export let searchQuery;
     let field = searchQuery;
     export let searchResults;
+    export let isProfile;
     //  ----------------------------
-    const itemsPerPage = 5; // Number of items to show per page
+    const itemsPerPage = 5;
     let currentPage = 1;
-    let totalItems // Assuming searchResults is the array containing all the search results
+    let totalItems;
 
     if (searchResults !== "") {
         totalItems = searchResults;
     } else {
-        totalItems = [];
+        totalItems = [1];
     }
+
     function onChangePage(newPage) {
         currentPage = newPage;
         updateDisplayedItems();
@@ -38,58 +42,77 @@
             displayedItems = totalItems.slice(startIndex, endIndex);
         }
     }
-
 </script>
 
-<header>
-    <a href="/"><img src="images/image.png" alt="Logo" class="logo" /></a>
-    <form on:submit|preventDefault={handleSubmit}>
-        <input
-            type="text"
-            id="search-input"
-            name="searchInput"
-            placeholder="Enter your search query..."
-            bind:value={field}
-        />
-        <button type="submit"><img src="images/search.png" alt="" /></button>
-    </form>
-</header>
+{#if !isProfile}
+    <header>
+        <a href="/"><img src="images/image.png" alt="Logo" class="logo" /></a>
+        <form on:submit|preventDefault={handleSubmit}>
+            <input
+                type="text"
+                id="search-input"
+                name="searchInput"
+                placeholder="Enter your search query..."
+                bind:value={field}
+            />
+            <button type="submit"><img src="images/search.png" alt="" /></button
+            >
+        </form>
+        <button type="toggle" on:click>Profile</button>
+    </header>
 
-<main>
-    <h3>Showing Results for {searchQuery}</h3>
-    <div class="result">
-        {#if typeof searchResults !== "string" && displayedItems.length > 0}
-            {#each displayedItems as result}
-                <div class="blk">
-                    <a href={result.url} target="_blank"><h3>{result.title}</h3></a>
-                    <p>{result.description}</p>
-                </div>
-            {/each}
-        {:else if typeof searchResults === "string" && searchResults !== ""}
-            <h4>{searchResults}</h4>
-        {:else if searchResults === ""}
-            <h4>The search result does not exist.</h4>
-        {:else}
-            <p>No results found.</p>
-        {/if}
-    </div>
-</main>
+    <main>
+        <h3>Showing Results for {searchQuery}</h3>
+        <div class="result">
+            {#if typeof searchResults !== "string" && displayedItems.length > 0}
+                {#each displayedItems as result}
+                    <div class="blk">
+                        <a href={result.website} target="_blank"
+                            ><h3>{result.name}</h3></a
+                        >
+                        <p>{result.location}</p>
+                        <p>{result.established}</p>
+                        <p>{result.programs}</p>
+                        {#each Object.entries(result.tuition) as [key, value]}
+                            <p>{key}: {value}</p>
+                        {/each}
+                        {#each Object.entries(result.admission) as [key, value]}
+                            <p>{key}: {value}</p>
+                        {/each}
+                    </div>
+                {/each}
+            {:else if typeof searchResults === "string" && searchResults !== ""}
+                <h4>{searchResults}</h4>
+            {:else if searchResults === ""}
+                <h4>The search result does not exist.</h4>
+            {:else}
+                <p>No results found.</p>
+            {/if}
+        </div>
+    </main>
 
-<Pagination
-  currentPage={currentPage}
-  totalPages={Math.ceil(totalItems.length / itemsPerPage)}
-  onChangePage={onChangePage}
-/>
+    <Pagination
+        {currentPage}
+        totalPages={Math.ceil(totalItems.length / itemsPerPage)}
+        {onChangePage}
+    />
 
-<footer>
-    <p>© 2023 Search Engine. All rights reserved.</p>
-</footer>
+    <footer>
+        <p>© 2023 Search Engine. All rights reserved.</p>
+    </footer>
+{:else}
+    <Profile on:click />
+{/if}
 
 <style>
     img {
         display: inline;
         height: 50px;
         margin-left: 5px;
+    }
+
+    img:hover {
+        scale: 1.2;
     }
     header {
         display: flex;
@@ -102,6 +125,23 @@
         text-align: center;
     }
 
+    header button[type="toggle"] {
+        position: absolute;
+        right: 50px;
+        padding: 3px;
+        font-size: medium;
+        background-color: #fff;
+        border: 1px solid #c9c3c3;
+        width: 55px;
+        height: 55px;
+        border-radius: 30%;
+        display: block;
+        cursor: pointer;
+    }
+
+    header button:hover {
+        scale: 1.1;
+    }
     /* h1 {
 		display: inline;
 		margin: 5px;
@@ -121,8 +161,12 @@
         width: 70vw;
         border-radius: 30px;
         font-size: 16px;
+        border: 0.5px solid #ccc;
+    }
+
+    input[type="text"]:hover {
         border: 1px solid #ccc;
-        box-shadow: 3px 3px 4px rgba(29, 28, 28, 0.1);
+        box-shadow: 3px 3px 4px 4px rgba(80, 78, 78, 0.2);
     }
 
     button[type="submit"] {
@@ -179,20 +223,34 @@
     }
 
     .blk:hover {
-        display: block;
+        /* display: block; */
         padding: 3px;
-        width: 30%;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 2px 2px 2px rgba(29, 28, 28, 0.4);
-        cursor: pointer;
+        /* width: 40%; */
+        scale: 1.05;
+        /* border: 1px solid #ccc; */
+        /* border-radius: 10px; */
+        /* box-shadow: 2px 2px 2px 2px rgba(29, 28, 28, 0.4); */
+        /* cursor: pointer; */
     }
 
-    a > h3 {
+    .blk a,
+    .blk a:active {
+        font-family: arial, sans-serif;
+        font-weight: 400;
+        text-decoration: none;
+        color: #1a0dab;
+    }
+
+    .blk a:hover {
+        text-decoration: underline;
+    }
+
+    .blk a > h3 {
         margin: 2px;
     }
 
     .blk > p {
+        font-family: arial, sans-serif;
         margin: 2px;
     }
 

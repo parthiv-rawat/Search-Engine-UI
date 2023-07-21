@@ -4,10 +4,29 @@
     let showSuggestions = false;
     let suggestions = [];
     let searchSuggestions = [];
-    let promiseSuggestions;
     let field = "";
     let inputElement;
+    let errorMessage;
 
+    // ----------------------------------------------------------------------
+    // function closeSuggestions(out) {
+    //     const suggestionBar = document.querySelector(".autocomplete ul");
+    //     if (suggestionBar && !suggestionBar.contains(out.target)) {
+    //         showSuggestions = false;
+    //     }
+    // }
+
+    // // Add the event listener when the component is mounted
+    // onMount(() => {
+    //     document.addEventListener("click", closeSuggestions);
+    // });
+
+    // // Remove the event listener when the component is unmounted (to avoid memory leaks)
+    // onDestroy(() => {
+    //     document.removeEventListener("click", closeSuggestions);
+    // });
+
+    // -------------------------------------------------------------------
     let debouncedHandleInput = null;
     afterUpdate(() => {
         debouncedHandleInput = debounce(handleInput, 300);
@@ -20,7 +39,7 @@
     }
 
     function selectSuggestion(suggestion) {
-        field = suggestion.title;
+        field = suggestion.name;
         showSuggestions = false;
         inputElement.focus();
     }
@@ -37,14 +56,16 @@
         }
 
         suggestions = searchSuggestions;
+        // console.log(suggestions)
         // console.log(Object.entries(suggestions[0]));
-        showSuggestions =
-            suggestions.length > 0 &&
-            suggestions.length != 34;
-        console.log(showSuggestions);
+        showSuggestions = suggestions.length > 0 && suggestions.length != 34;
+        // console.log(showSuggestions);
     }
 </script>
 
+{#if errorMessage}
+    <div class="error-message">{errorMessage}</div>
+{/if}
 <input
     type="text"
     id="search-input"
@@ -55,12 +76,14 @@
     bind:this={inputElement}
 />
 <button type="submit" on:click><img src="images/search.png" alt="" /></button>
+
 <div class="autocomplete">
     {#if showSuggestions}
         <ul>
             {#each suggestions as suggestion}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <li on:click={() => selectSuggestion(suggestion)}>
-                    {suggestion.title}
+                    {suggestion.name}
                 </li>
             {/each}
         </ul>
@@ -73,8 +96,12 @@
         width: 150vh;
         border-radius: 50px;
         font-size: 16px;
+        border: 0.5px solid #ccc;
+    }
+
+    input[type="text"]:hover {
         border: 1px solid #ccc;
-        box-shadow: 3px 3px 4px rgba(29, 28, 28, 0.1);
+        box-shadow: 3px 3px 4px 4px rgba(29, 28, 28, 0.1);
     }
 
     button[type="submit"] {
@@ -86,6 +113,10 @@
         color: #fff;
         border: none;
         cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        scale: 1.1;
     }
 
     button img {
@@ -128,11 +159,6 @@
 
     .autocomplete ul li:hover {
         background-color: #f0f0f0; /* Highlight the hovered suggestion */
-    }
-
-    .autocomplete ul li.active {
-        background-color: #e9ab39; /* Highlight the selected suggestion */
-        color: #fff; /* Set text color for better contrast */
     }
 
     /* Custom scrollbar for the suggestions list */
